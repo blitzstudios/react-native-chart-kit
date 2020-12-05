@@ -56,18 +56,20 @@ var AbstractChart = /** @class */ (function(_super) {
   function AbstractChart() {
     var _this = (_super !== null && _super.apply(this, arguments)) || this;
     _this.calcScaler = function(data) {
+      var min = _this.props.min || Math.min.apply(Math, data);
+      var max = _this.props.max || Math.max.apply(Math, data);
       if (_this.props.fromZero) {
         return (
           Math.max.apply(Math, __spreadArrays(data, [0])) -
             Math.min.apply(Math, __spreadArrays(data, [0])) || 1
         );
       } else {
-        return Math.max.apply(Math, data) - Math.min.apply(Math, data) || 1;
+        return max - min || 1;
       }
     };
     _this.calcBaseHeight = function(data, height) {
-      var min = Math.min.apply(Math, data);
-      var max = Math.max.apply(Math, data);
+      var min = _this.props.min || Math.min.apply(Math, data);
+      var max = _this.props.max || Math.max.apply(Math, data);
       if (min >= 0 && max >= 0) {
         return height;
       } else if (min < 0 && max <= 0) {
@@ -77,8 +79,8 @@ var AbstractChart = /** @class */ (function(_super) {
       }
     };
     _this.calcHeight = function(val, data, height) {
-      var max = Math.max.apply(Math, data);
-      var min = Math.min.apply(Math, data);
+      var min = _this.props.min || Math.min.apply(Math, data);
+      var max = _this.props.max || Math.max.apply(Math, data);
       if (min < 0 && max > 0) {
         return height * (val / _this.calcScaler(data));
       } else if (min >= 0 && max >= 0) {
@@ -152,6 +154,7 @@ var AbstractChart = /** @class */ (function(_super) {
         yAxisSuffix = _f === void 0 ? "" : _f,
         _g = _d.yLabelsOffset,
         yLabelsOffset = _g === void 0 ? 12 : _g;
+      var min = _this.props.min || Math.min.apply(Math, data);
       return new Array(count === 1 ? 1 : count + 1).fill(1).map(function(_, i) {
         var yLabel = String(i * count);
         if (count === 1) {
@@ -164,7 +167,7 @@ var AbstractChart = /** @class */ (function(_super) {
           var label = _this.props.fromZero
             ? (_this.calcScaler(data) / count) * i +
               Math.min.apply(Math, __spreadArrays(data, [0]))
-            : (_this.calcScaler(data) / count) * i + Math.min.apply(Math, data);
+            : (_this.calcScaler(data) / count) * i + min;
           yLabel =
             "" +
             yAxisLabel +
