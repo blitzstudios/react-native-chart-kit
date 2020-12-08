@@ -697,7 +697,8 @@ var LineChart = /** @class */ (function(_super) {
                       __assign(__assign({}, config), {
                         count: count,
                         paddingTop: paddingTop,
-                        paddingRight: paddingRight
+                        paddingRight: paddingRight,
+                        data: datas
                       })
                     )
                   : withOuterLines

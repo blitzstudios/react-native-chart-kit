@@ -95,11 +95,15 @@ var AbstractChart = /** @class */ (function(_super) {
     };
     _this.renderHorizontalLines = function(config) {
       var count = config.count,
+        data_count = config.data ? config.data.length : 0,
         width = config.width,
         height = config.height,
         paddingTop = config.paddingTop,
         paddingRight = config.paddingRight;
       var basePosition = height - height / 4;
+      var x2 =
+        ((width - paddingRight) / data_count) * (data_count - 1) + paddingRight;
+
       return __spreadArrays(new Array(count + 1)).map(function(_, i) {
         var y = (basePosition / count) * i + paddingTop;
         return (
@@ -107,7 +111,7 @@ var AbstractChart = /** @class */ (function(_super) {
             key={Math.random()}
             x1={paddingRight}
             y1={y}
-            x2={width}
+            x2={data_count ? x2 : width}
             y2={y}
             {..._this.getPropsForBackgroundLines()}
           />
@@ -116,15 +120,20 @@ var AbstractChart = /** @class */ (function(_super) {
     };
     _this.renderHorizontalLine = function(config) {
       var width = config.width,
+        data_count = config.data ? config.data.count : 0,
         height = config.height,
         paddingTop = config.paddingTop,
         paddingRight = config.paddingRight;
+
+      var x2 =
+        ((width - paddingRight) / data_count) * (data_count - 1) + paddingRight;
+
       return (
         <Line
           key={Math.random()}
           x1={paddingRight}
           y1={height - height / 4 + paddingTop}
-          x2={width}
+          x2={data_count ? x2 : width}
           y2={height - height / 4 + paddingTop}
           {..._this.getPropsForBackgroundLines()}
         />
@@ -222,7 +231,9 @@ var AbstractChart = /** @class */ (function(_super) {
         _j = _g.xLabelsOffset,
         xLabelsOffset = _j === void 0 ? 0 : _j,
         _k = _g.hidePointsAtIndex,
-        hidePointsAtIndex = _k === void 0 ? [] : _k;
+        hidePointsAtIndex = _k === void 0 ? [] : _k,
+        _l = _g.renderVerticalLabels,
+        renderVerticalLabels = _l;
       var fontSize = 12;
       var fac = 1;
       if (stackedBar) {
@@ -238,6 +249,16 @@ var AbstractChart = /** @class */ (function(_super) {
             horizontalOffset) *
           fac;
         var y = (height * 3) / 4 + paddingTop + fontSize * 2 + xLabelsOffset;
+
+        if (!!renderVerticalLabels) {
+          return renderVerticalLabels({
+            index: i,
+            x,
+            y,
+            rotation: verticalLabelRotation
+          });
+        }
+
         return (
           <Text
             origin={x + ", " + y}
