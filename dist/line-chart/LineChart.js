@@ -57,15 +57,7 @@ import {
   TextInput,
   View
 } from "react-native";
-import {
-  Circle,
-  G,
-  Path,
-  Polygon,
-  Polyline,
-  Rect,
-  Svg
-} from "react-native-svg";
+import { Circle, G, Path, Polygon, Line, Rect, Svg } from "react-native-svg";
 import AbstractChart from "../AbstractChart";
 import { LegendItem } from "./LegendItem";
 var AnimatedCircle = Animated.createAnimatedComponent(Circle);
@@ -82,6 +74,13 @@ var LineChart = /** @class */ (function(_super) {
     };
     _this.getStrokeWidth = function(dataset) {
       return dataset.strokeWidth || _this.props.chartConfig.strokeWidth || 3;
+    };
+    _this.getStrokeDashArray = function(dataset, index) {
+      let strokeDashArrayAtIndex =
+        dataset.strokeDashArrayAtIndex ||
+        _this.props.chartConfig.strokeDashArrayAtIndex;
+
+      return strokeDashArrayAtIndex ? strokeDashArrayAtIndex(index) : "";
     };
     _this.getDatas = function(data) {
       return data.reduce(function(acc, item) {
@@ -430,26 +429,28 @@ var LineChart = /** @class */ (function(_super) {
       var baseHeight = _this.calcBaseHeight(datas, height);
       var lastPoint;
       data.forEach(function(dataset, index) {
-        var points = dataset.data.map(function(d, i) {
-          if (d === null) return lastPoint;
+        dataset.data.map(function(d, i) {
           var x =
             (i * (width - paddingRight)) / dataset.data.length + paddingRight;
           var y =
             ((baseHeight - _this.calcHeight(d, datas, height)) / 4) * 3 +
             paddingTop;
-          lastPoint = x + "," + y;
-          return x + "," + y;
+
+          output.push(
+            <Line
+              key={i}
+              x1={lastPoint ? lastPoint.x : x}
+              y1={lastPoint ? lastPoint.y : y}
+              x2={x}
+              y2={y}
+              stroke={_this.getColor(dataset, 0.2)}
+              strokeDasharray={_this.getStrokeDashArray(dataset, i)}
+              strokeWidth={_this.getStrokeWidth(dataset)}
+            />
+          );
+
+          lastPoint = { x, y };
         });
-        output.push(
-          <Polyline
-            key={index}
-            strokeLinejoin={linejoinType}
-            points={points.join(" ")}
-            fill="none"
-            stroke={_this.getColor(dataset, 0.2)}
-            strokeWidth={_this.getStrokeWidth(dataset)}
-          />
-        );
       });
       return output;
     };
